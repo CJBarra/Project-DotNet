@@ -1,23 +1,23 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useContext } from "react";
 import { Segment, Form, Button } from "semantic-ui-react";
 import { IActivity } from "../../app/models/activity";
 import { v4 as uuid } from "uuid";
+import { observer } from "mobx-react-lite";
+import ActivityStore from "../../app/stores/activityStore";
 
 interface IProps {
-  setEditMode: (editMode: boolean) => void;
   activity: IActivity;
-  createActivity: (activity: IActivity) => void;
-  editActivity: (activity: IActivity) => void;
-  submitting:boolean;
 }
 
-export const ActivityForm: React.FC<IProps> = ({
-  setEditMode,
-  activity: initialFormState,
-  createActivity,
-  editActivity,
-  submitting
-}) => {
+const ActivityForm: React.FC<IProps> = ({ activity: initialFormState }) => {
+  const activityStore = useContext(ActivityStore);
+  const {
+    createActivity,
+    editActivity,
+    submitting,
+    cancelFormOpen
+  } = activityStore;
+
   const initializeForm = () => {
     if (initialFormState) {
       return initialFormState;
@@ -45,7 +45,7 @@ export const ActivityForm: React.FC<IProps> = ({
       };
       createActivity(newActivity);
     } else {
-      editActivity(activity);
+      editActivity(activity); // activityStore
     }
   };
 
@@ -97,9 +97,15 @@ export const ActivityForm: React.FC<IProps> = ({
           placeholder="Venue"
           value={activity.venue}
         />
-        <Button loading={submitting} floated="right" positive type="submit" content="Submit" />
         <Button
-          onClick={() => setEditMode(false)}
+          loading={submitting}
+          floated="right"
+          positive
+          type="submit"
+          content="Submit"
+        />
+        <Button
+          onClick={cancelFormOpen}
           floated="right"
           type="submit"
           content="Cancel"
@@ -108,3 +114,5 @@ export const ActivityForm: React.FC<IProps> = ({
     </Segment>
   );
 };
+
+export default observer(ActivityForm);
