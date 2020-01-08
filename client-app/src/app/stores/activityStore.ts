@@ -15,8 +15,23 @@ class ActivityStore {
 
   //-- Sort activites by Date
   @computed get activitiesByDate() {
-    return Array.from(this.activityRegistry.values()).sort(
+    return this.groupActivitiesByDate(
+      Array.from(this.activityRegistry.values())
+    );
+  }
+
+  groupActivitiesByDate(activities: IActivity[]) {
+    const sortedActivites = activities.sort(
       (a, b) => Date.parse(a.date) - Date.parse(b.date)
+    );
+    return Object.entries(
+      sortedActivites.reduce((activities, activity) => {
+        const date = activity.date.split("T")[0];
+        activities[date] = activities[date]
+          ? [...activities[date], activity]
+          : [activity];
+        return activities;
+      }, {} as { [key: string]: IActivity[] })
     );
   }
 
@@ -124,7 +139,6 @@ class ActivityStore {
   @action clearActivity = () => {
     this.activity = null;
   };
-
 }
 /*  
 Import createContext from 'React' not 'vm' 
