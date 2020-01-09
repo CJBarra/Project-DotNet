@@ -19,7 +19,7 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
   // Pass activities as a prop to ActivityDashboard
   return (
     <Fragment>
-      <ToastContainer position="bottom-right" />>
+      <ToastContainer position="bottom-right" />
       <Route exact path="/" component={HomePage} />
       <Route
         path={"/(.+)"}
