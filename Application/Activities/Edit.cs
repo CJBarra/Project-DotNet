@@ -1,6 +1,9 @@
 using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Errors;
+using FluentValidation;
 using MediatR;
 using Persistence;
 
@@ -20,6 +23,20 @@ namespace Applications.Activities
             public string Venue { get; set; }
         }
 
+        //{ TODO: Add fluent validation --adjust class dependancies to NETCoreApp 3.0 }
+        public class CommandValidator : AbstractValidator<Command>
+        {
+            public CommandValidator()
+            {
+                RuleFor(x => x.Title).NotEmpty();
+                RuleFor(x => x.Description).NotEmpty();
+                RuleFor(x => x.Category).NotEmpty();
+                RuleFor(x => x.Date).NotEmpty();
+                RuleFor(x => x.City).NotEmpty();
+                RuleFor(x => x.Venue).NotEmpty();
+            }
+        }
+
         public class Handler : IRequestHandler<Command>
         {
             private readonly DataContext _context;
@@ -33,7 +50,10 @@ namespace Applications.Activities
                 var activity = await _context.Activities.FindAsync(request.Id);
 
                 if (activity == null)
-                    throw new Exception("Could not find activity requested");
+                {
+                    throw new RestException(HttpStatusCode.NotFound, new { activity = "Not found" });
+                }
+
 
                 // UPDATE Fields
                 activity.Title = request.Title ?? activity.Title;
@@ -50,7 +70,5 @@ namespace Applications.Activities
                 // API controller return 200 Ok response if successful
             }
         }
-
     }
-
 }

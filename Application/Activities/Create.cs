@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain;
+using FluentValidation;
 using MediatR;
 using Persistence;
-
 namespace Application.Activities
 {
     public class Create
@@ -18,6 +18,20 @@ namespace Application.Activities
             public DateTime Date { get; set; }
             public string City { get; set; }
             public string Venue { get; set; }
+        }
+
+        //{ TODO: Add fluent validation --adjust class dependancies to NETCoreApp 3.0 }
+        public class CommandValidator : AbstractValidator<Command>
+        {
+            public CommandValidator()
+            {
+                RuleFor(x => x.Title).NotEmpty();
+                RuleFor(x => x.Description).NotEmpty();
+                RuleFor(x => x.Category).NotEmpty();
+                RuleFor(x => x.Date).NotEmpty();
+                RuleFor(x => x.City).NotEmpty();
+                RuleFor(x => x.Venue).NotEmpty();
+            }
         }
 
         public class Handler : IRequestHandler<Command>
@@ -44,7 +58,6 @@ namespace Application.Activities
                 };
 
                 _context.Activities.Add(activity);
-                // Return int for number of changes in database
 
                 var success = await _context.SaveChangesAsync() > 0;
                 // Send Empty object to API request

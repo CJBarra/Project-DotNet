@@ -1,10 +1,41 @@
 import axios, { AxiosResponse } from "axios";
 import { IActivity } from "../models/activity";
+import { history } from "../..";
+import { toast } from "react-toastify";
 
 // set default baseURL 'http://localhost:5000/'
 axios.defaults.baseURL = "http://localhost:5000/api";
 
+// TODO: Intercept response from server for Errors
+axios.interceptors.response.use(undefined, err => {
+  if (err.message === "Network Error" && !err.response) {
+    toast.error("Network error");
+  }
+  const { status, data, config } = err.response;
+
+  if (status === 404) {
+    history.push("/notfound");
+  }
+  // console.log(err.response);
+  if (
+    status === 400 &&
+    config.method === "get" &&
+    data.errors.hasOwnProperty("id")
+  ) {
+    history.push("/notfound");
+  }
+  if (status === 500) {
+    toast.error("Server Error -  check terminal!");
+  }
+});
+
 const responseBody = (response: AxiosResponse) => response.data;
+
+//-------- Development purposes ONLY
+const sleep = (ms: number) => (response: AxiosResponse) =>
+  new Promise<AxiosResponse>(resolve =>
+    setTimeout(() => resolve(response), ms)
+  );
 
 // Requests objects for api
 const requests = {
@@ -39,12 +70,6 @@ const Activities = {
     requests.put(`/activities/${activity.id}`, activity),
   delete: (id: string) => requests.del(`/activities/${id}`)
 };
-
-//-------- Development purposes ONLY
-const sleep = (ms: number) => (response: AxiosResponse) =>
-  new Promise<AxiosResponse>(resolve =>
-    setTimeout(() => resolve(response), ms)
-  );
 
 export default {
   Activities
