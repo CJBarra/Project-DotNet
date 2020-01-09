@@ -10,8 +10,8 @@ const DateInput: React.FC<IProps> = ({
   width,
   id = null,
   placeholder,
-  date = false,
-  time = false,
+  date,
+  time,
   meta: { touched, error },
   ...rest
 }) => {
