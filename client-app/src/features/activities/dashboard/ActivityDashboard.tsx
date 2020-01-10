@@ -2,19 +2,20 @@ import React, { useContext, useEffect } from "react";
 import { Grid } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
 import ActivityList from "./ActivityList";
-import ActivityStore from "../../../app/stores/activityStore";
 import { LoadingComponent } from "../../../app/layout/LoadingComponent";
+import { RootStoreContext } from "../../../app/stores/rootStore";
 
 const ActivityDashboard: React.FC = () => {
-  const activitiyStore = useContext(ActivityStore);
+  const rootStore = useContext(RootStoreContext);
+  const {loadActivities, loadingInitial} = rootStore.activityStore;
 
   //-------- REACT Hook
   // Access api agent file for requests objects '../api/agent.ts'
   useEffect(() => {
-    activitiyStore.loadActivities();
-  }, [activitiyStore]);
+    loadActivities();
+  }, [loadActivities]);
 
-  if (activitiyStore.loadingInitial)
+  if (loadingInitial)
     return <LoadingComponent content="Loading activities.." />;
 
   return (

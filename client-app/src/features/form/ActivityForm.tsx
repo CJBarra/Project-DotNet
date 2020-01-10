@@ -3,7 +3,6 @@ import { Segment, Form, Button, Grid } from "semantic-ui-react";
 import { ActivityFormValues } from "../../app/models/activity";
 import { v4 as uuid } from "uuid";
 import { observer } from "mobx-react-lite";
-import ActivityStore from "../../app/stores/activityStore";
 import { RouteComponentProps } from "react-router-dom";
 import { Form as FinalForm, Field } from "react-final-form";
 import TextInput from "../../app/common/form/TextInput";
@@ -18,6 +17,7 @@ import {
   composeValidators,
   hasLengthGreaterThan
 } from "revalidate";
+import { RootStoreContext } from "../../app/stores/rootStore";
 
 /* { Revalidate is a library for creating and composing together small validation functions to create complex, robust validations. 
 Elegant and composable validations http://revalidate.jeremyfairbank.com } */
@@ -44,12 +44,13 @@ const ActivityForm: React.FC<RouteComponentProps<DetailsParams>> = ({
   match,
   history
 }) => {
-  const activityStore = useContext(ActivityStore);
+  const rootStore = useContext(RootStoreContext);
   const {
     createActivity,
     editActivity,
     submitting,
-    loadActivity  } = activityStore;
+    loadActivity
+  } = rootStore.activityStore;
 
   const [activity, setActivity] = useState(new ActivityFormValues());
   const [loading, setLoading] = useState(false);
