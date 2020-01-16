@@ -9,7 +9,7 @@ const ActivityDashboard: React.FC = () => {
   const rootStore = useContext(RootStoreContext);
   const {loadActivities, loadingInitial} = rootStore.activityStore;
 
-  //-------- REACT Hook
+  //-------- REACT Hooks
   // Access api agent file for requests objects '../api/agent.ts'
   useEffect(() => {
     loadActivities();

@@ -3,6 +3,7 @@ using API.Middleware;
 using Application.Activities;
 using Application.Infrastructure;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using FluentValidation.AspNetCore;
 using Infrastructure.Security;
@@ -36,6 +37,7 @@ namespace API
         {
             services.AddDbContext<DataContext>(opt =>
             {
+                opt.UseLazyLoadingProxies();
                 opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
 
@@ -51,6 +53,7 @@ namespace API
                 });
             });
             services.AddMediatR(typeof(List.Handler).Assembly);
+            services.AddAutoMapper(typeof(List.Handler));
 
             // Net Core 3.0 -- Swaps .AddMvc for .AddControllers
             services.AddControllers(options =>
@@ -65,11 +68,23 @@ namespace API
 
             // Add IdentityCore, IdentityBuilder here
             var builder = services.AddIdentityCore<AppUser>();
+
             var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
             identityBuilder.AddEntityFrameworkStores<DataContext>();
             identityBuilder.AddSignInManager<SignInManager<AppUser>>();
 
-            // System clock security necessary for  .Net Core 3.0 Identity
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("IsEventHost", policy =>
+                {
+                    policy.Requirements.Add(new IsHostRequired());
+                });
+            });
+
+            //----------- AddTransient to make available for operation lifetime only
+            services.AddTransient<IAuthorizationHandler, IsHostRequiredHandler>();
+
+            //----------- System clock security necessary for  .Net Core 3.0 Identity
             var key = new SymmetricSecurityKey(Encoding.UTF8
             .GetBytes(Configuration["TokenKey"]));
 
