@@ -12,6 +12,8 @@ namespace Persistence
         public DbSet<Value> Values { get; set; }
         public DbSet<Activity> Activities { get; set; }
         public DbSet<UserActivity> UserActivities { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             /* { Provide base OnModelCreating to allow PRIMARY KEY of string for AppUser during Migration } */

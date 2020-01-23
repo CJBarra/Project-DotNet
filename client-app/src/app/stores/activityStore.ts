@@ -6,6 +6,11 @@ import { history } from "../..";
 import { toast } from "react-toastify";
 import { RootStore } from "./rootStore";
 import { setActivityProps, createAttendee } from "../common/util/util";
+import {
+  HubConnection,
+  HubConnectionBuilder,
+  LogLevel
+} from "@microsoft/signalr";
 
 export default class ActivityStore {
   rootStore: RootStore;
@@ -20,6 +25,7 @@ export default class ActivityStore {
   @observable loading = false;
   @observable submitting = false;
   @observable target = "";
+  @observable.ref hubConnection: HubConnection | null = null;
 
   //----------------------------- SORT ACTIVITIES BY DATE
   @computed get activitiesByDate() {
@@ -44,6 +50,39 @@ export default class ActivityStore {
   }
 
   //----------------------------- ACTIONS
+
+  @action createHubConnection = () => {
+    this.hubConnection = new HubConnectionBuilder()
+      .withUrl("http://localhost:5000/chat", {
+        accessTokenFactory: () => this.rootStore.commonStore.token!
+      })
+      .configureLogging(LogLevel.Information)
+      .build();
+
+    this.hubConnection
+      .start()
+      .then(() => console.log(this.hubConnection!.state))
+      .catch(err => console.log("Error establisting connection: ", err));
+
+    this.hubConnection.on("ReceiveComment", comment => {
+      runInAction(() => {
+        this.activity!.comments.push(comment);
+      });
+    });
+  };
+
+  @action stopHubConnection = () => {
+    this.hubConnection!.stop();
+  };
+
+  @action addComment = async (values: any) => {
+    values.activityId = this.activity!.id;
+    try {
+      await this.hubConnection!.invoke("SendComment", values);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   @action loadActivities = async () => {
     this.loadingInitial = true;
@@ -98,7 +137,7 @@ export default class ActivityStore {
     try {
       await agent.Activities.create(activity);
       const attendee = createAttendee(this.rootStore.userStore.user!);
-      attendee.isHost =true;
+      attendee.isHost = true;
       let attendees = [];
       attendees.push(attendee);
       activity.attendees = attendees;
@@ -159,10 +198,6 @@ export default class ActivityStore {
     }
   };
 
-  getActivity = (id: string) => {
-    return this.activityRegistry.get(id);
-  };
-
   @action clearActivity = () => {
     this.activity = null;
   };
@@ -209,6 +244,10 @@ export default class ActivityStore {
       });
       toast.error("Problem cancelling attendance");
     }
+  };
+
+  getActivity = (id: string) => {
+    return this.activityRegistry.get(id);
   };
 }
 

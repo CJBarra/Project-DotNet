@@ -1,5 +1,7 @@
 using System.Text;
+using System.Threading.Tasks;
 using API.Middleware;
+using API.SignalR;
 using Application.Activities;
 using Application.Infrastructure;
 using Application.Interfaces;
@@ -49,11 +51,16 @@ namespace API
                 {
                     policy.AllowAnyHeader()
                     .AllowAnyMethod()
-                    .WithOrigins("http://localhost:3000");
+                    .WithOrigins("http://localhost:3000")
+                    .AllowCredentials();
                 });
             });
+
             services.AddMediatR(typeof(List.Handler).Assembly);
+
             services.AddAutoMapper(typeof(List.Handler));
+
+            services.AddSignalR();
 
             // Net Core 3.0 -- Swaps .AddMvc for .AddControllers
             services.AddControllers(options =>
@@ -98,6 +105,20 @@ namespace API
                     ValidateAudience = false,
                     ValidateIssuer = false,
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken)
+                            && (path.StartsWithSegments("/path")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             // Add JSON web Token generators for authentication
@@ -116,12 +137,14 @@ namespace API
             // app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("CorsPolicy");
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat");
             });
         }
     }
