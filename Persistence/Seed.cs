@@ -21,21 +21,21 @@ namespace Persistence
                         Id = "a",
                         DisplayName = "Jon",
                         UserName = "jonsmith",
-                        Email = "jonsmith@email.ca"
+                        Email = "jonsmith@email.com"
                     },
                     new AppUser
                     {
                         Id = "b",
                         DisplayName = "Jane",
                         UserName = "janedoe",
-                        Email = "janedoe@email.ca"
+                        Email = "janedoe@email.com"
                     },
                     new AppUser
                     {
                         Id = "c",
                         DisplayName = "Tom",
                         UserName = "tomwick",
-                        Email = "tomwick@email.ca"
+                        Email = "tomwick@email.com"
                     },
                 };
 

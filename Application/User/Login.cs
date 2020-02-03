@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,14 +52,13 @@ namespace Application.User
                 var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
                 if (result.Succeeded)
-                {
-                    // Return generated token
+                {    // Return generated token
                     return new User
                     {
                         DisplayName = user.DisplayName,
                         Token = _jwtGen.CreateToken(user),
                         Username = user.UserName,
-                        Image = null,
+                        Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
                     };
                 }
 
@@ -66,5 +66,4 @@ namespace Application.User
             }
         }
     }
-
 }
