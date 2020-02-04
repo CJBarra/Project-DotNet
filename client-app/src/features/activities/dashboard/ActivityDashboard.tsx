@@ -19,7 +19,7 @@ const ActivityDashboard: React.FC = () => {
     return <LoadingComponent content="Loading activities.." />;
 
   return (
-    <Grid>
+    <Grid doubling columns={2}>
       <Grid.Column width={10}>
         <ActivityList />
       </Grid.Column>

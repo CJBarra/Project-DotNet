@@ -51,7 +51,7 @@ export default class ActivityStore {
 
   //----------------------------- ACTIONS
 
-  @action createHubConnection = () => {
+  @action createHubConnection = (activityId: string) => {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl("http://localhost:5000/chat", {
         accessTokenFactory: () => this.rootStore.commonStore.token!
@@ -62,6 +62,9 @@ export default class ActivityStore {
     this.hubConnection
       .start()
       .then(() => console.log(this.hubConnection!.state))
+      .then(() => {
+        this.hubConnection!.invoke("AddToGroup", activityId);
+      })
       .catch(err => console.log("Error establisting connection: ", err));
 
     this.hubConnection.on("ReceiveComment", comment => {
@@ -69,10 +72,19 @@ export default class ActivityStore {
         this.activity!.comments.push(comment);
       });
     });
+
+    this.hubConnection.on("Send", message => {
+      toast.info(message);
+    });
   };
 
   @action stopHubConnection = () => {
-    this.hubConnection!.stop();
+    this.hubConnection!.invoke("RemoveFromGroup", this.activity!.id)
+      .then(() => {
+        this.hubConnection!.stop();
+      })
+      .then(() => console.log("Connection stopped"))
+      .catch(err => console.log(err));
   };
 
   @action addComment = async (values: any) => {
@@ -142,6 +154,7 @@ export default class ActivityStore {
       attendees.push(attendee);
       activity.attendees = attendees;
       activity.isHost = true;
+      activity.comments = [];
 
       runInAction("creating activity", () => {
         this.activityRegistry.set(activity.id, activity);
