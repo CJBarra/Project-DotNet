@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { Header, Grid, Image, Button } from "semantic-ui-react";
+import { Header, Grid, Button } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
 import WidgetDropzone from "./WidgetDropzone";
 import WidgetCropper from "./WidgetCropper";

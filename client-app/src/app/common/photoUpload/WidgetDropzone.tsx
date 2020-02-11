@@ -27,7 +27,7 @@ const WidgetDropzone: React.FC<IProps> = ({ setFiles }) => {
       )
     );
     console.log(acceptedFiles);
-  }, []);
+  }, [setFiles]);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
