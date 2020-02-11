@@ -45,6 +45,5 @@ namespace API.SignalR
             var username = GetUsername();
             await Clients.Group(groupName).SendAsync("Send", $"{username} has left the group.");
         }
-
     }
 }

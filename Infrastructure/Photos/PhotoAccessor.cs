@@ -13,11 +13,7 @@ namespace Infrastructure.Photos
         private readonly Cloudinary _cloudinary;
         public PhotoAccessor(IOptions<CloudinarySettings> config)
         { // Pass new Cloudinary instance to account 
-            var acc = new Account(
-                config.Value.CloudName,
-                config.Value.ApiKey,
-                config.Value.ApiSecret
-            );
+            var acc = new Account(config.Value.CloudName, config.Value.ApiKey, config.Value.ApiSecret);
             _cloudinary = new Cloudinary(acc);
         }
 

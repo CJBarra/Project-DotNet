@@ -93,8 +93,7 @@ namespace API
             services.AddTransient<IAuthorizationHandler, IsHostRequiredHandler>();
 
             //----------- System clock security necessary for  .Net Core 3.0 Identity
-            var key = new SymmetricSecurityKey(Encoding.UTF8
-            .GetBytes(Configuration["TokenKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -151,5 +150,4 @@ namespace API
             });
         }
     }
-
 }

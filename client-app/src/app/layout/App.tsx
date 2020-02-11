@@ -17,7 +17,7 @@ import NotFound from "./NotFound";
 import { RootStoreContext } from "../stores/rootStore";
 import { LoadingComponent } from "./LoadingComponent";
 import ModalContainer from "../common/modals/ModalContainer";
-import ProfilePage from "../../features/profile/ProfilePage";
+import ProfilePage from "../../features/profiles/ProfilePage";
 
 const App: React.FC<RouteComponentProps> = ({ location }) => {
   const rootStore = useContext(RootStoreContext);
