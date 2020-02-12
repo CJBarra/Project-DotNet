@@ -46,7 +46,7 @@ const ActivityDetailChat = () => {
           <Container style={{ overflow: "auto", maxHeight: "20em" }}>
             {activity &&
               activity.comments &&
-              activity.comments.map(comment => (
+              activity.comments.map((comment) => (
                 <Comment key={comment.id}>
                   <Comment.Avatar src={comment.image || "/assets/user.png"} />
                   <Comment.Content>
